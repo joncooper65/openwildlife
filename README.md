@@ -3,7 +3,7 @@ Map My Wildife
 
 An app to map widlife records delivered from Gbif rest services.
 
-Point your device at this to see a recent iteration: http://joncooper65.github.io/scattermap/
+Point your device at this to see a recent iteration: http://joncooper65.github.io/openwildlife/
 
 The vision is to have a location aware map sprinkled with interactive place markers displaying wildlife records.  The user can choose their preferences for common/scientific naming, earliest year and species group.  The placemarkers show species recorded there and the datasets they come from.  The map can be summarised to show common species, taxon group statistics, datasets accessed and date ranges.
 

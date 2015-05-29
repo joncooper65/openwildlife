@@ -4,11 +4,12 @@ require.config({
     "jquerymobile": "../vendor/jquery-mobile-bower/js/jquery.mobile-1.4.2.min",
     "leaflet": "../vendor/leaflet/dist/leaflet",
     "underscore": "../vendor/underscore/underscore-min",
-    "Chart": "../vendor/Chart.js/Chart.min"
+    "Chart": "../vendor/Chart.js/Chart.min",
+    "legend": "../vendor/Chart.js.legend/src/legend"
   }
 });
 
-require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($, jquerymobile, L, _, Chart){
+require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart", "legend"], function($, jquerymobile, L, _, Chart, legend){
   $(document).ready(function() {
 
     var map;
@@ -754,6 +755,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
         sortedGroups = _.sortBy(vernacularGroupsArray, function(group){return (-1 * group.numRecs);});
       }
       addGroupsToPage(sortedGroups);
+      addChartToPage(sortedGroups);
       summaryData.loadingGroups = false;
       if(!summaryData.isLoading()){
         document.body.dispatchEvent(new CustomEvent('summarygenerated'));
@@ -900,7 +902,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       );
     });
     $('#summary').enhanceWithin();
-    console.log(groups);
   }
 
   function addTop10speciesToPage(top10Species){
@@ -920,6 +921,30 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       );
     });
     $('#summary').enhanceWithin();
+  }
+
+  function addChartToPage(sortedGroups){
+    console.log(sortedGroups);
+    var data = [];
+    _.each(sortedGroups, function(group){
+      data.push({
+        'value': group.numSpecies,
+        'color': '#' + Math.floor(Math.random()*16777215).toString(16),
+        'highlight': '#0f0',
+        'label': group.name
+      });
+    });
+//     var options = {
+//       'legendTemplate': "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"background-color:<%=segments[i].fillColor%>\"></span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
+
+// var moduleDoughnut = new Chart(canvas.getContext('2d')).Doughnut(moduleData, { tooltipTemplate : "<%if (label){%><%=label%>: <%}%><%= value %>kb", animation: false });
+
+//     };
+    var ctx = $('#group-chart').get(0).getContext('2d');
+    var groupChart = new Chart(ctx).Pie(data);
+
+    //take a look at this and its source to get going: http://bebraw.github.io/Chart.js.legend/
+    //legend(document.getElementById("pieLegend"), data);
   }
 
 

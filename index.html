@@ -120,6 +120,12 @@
 			<div data-role="content">
 				<p>There are <span id='summary-num-markers'></span> placemarkers on your map containing <span id='summary-num-species'></span> species from <span id='summary-earliest-rec'></span> to <span id='summary-latest-rec'></span>.</p>
 				<p>Your map has <span id='summary-percentage-recs'></span>% (<span id='summary-num-recs'></span>) of the sightings available from Gbif for the area shown.
+
+				<div class='app-chart-container'>
+					<canvas id='group-chart'></canvas>
+				</div>
+
+
  				<div data-role="collapsible" data-theme="b" data-content-theme="b">
  					<h4><span id='summary-species-title'/></h4>
 					<table id='top-ten-species' class='summary-table'>
@@ -146,7 +152,6 @@
 						<tbody>
 						</tbody>
 					</table>
-					<canvas id='group-chart' class='chart'></canvas>
 				</div>
  				<div data-role="collapsible" data-theme="b" data-content-theme="b">
 					<h4>Datasets</h4>

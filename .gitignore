@@ -1,6 +1,4 @@
 .vagrant
-vendor
-node_modules
 
 # Created by http://www.gitignore.io
 

@@ -12,6 +12,10 @@ The first iteration aims to take the Gbif services as far as they can go.  Since
 dev notes
 ---------
 
+grunt install -g grunt-cli
+
+
+
 Would like to move over to backbone, coffescript, freemarker and setup proper grunt tasks for building, dist, etc
 
 sudo apt-get install nodejs

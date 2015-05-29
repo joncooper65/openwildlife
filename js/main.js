@@ -3,11 +3,12 @@ require.config({
     "jquery": "../vendor/jquery/jquery.min",
     "jquerymobile": "../vendor/jquery-mobile-bower/js/jquery.mobile-1.4.2.min",
     "leaflet": "../vendor/leaflet/dist/leaflet",
-    "underscore": "../vendor/underscore/underscore-min"
+    "underscore": "../vendor/underscore/underscore-min",
+    "Chart": "../vendor/Chart.js/Chart.min"
   }
 });
 
-require(["jquery", "jquerymobile", "leaflet", "underscore"], function($, jquerymobile, L, _){
+require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($, jquerymobile, L, _, Chart){
   $(document).ready(function() {
 
     var map;
@@ -25,6 +26,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore"], function($, jquerym
     var hadLocationUnavailableError = false;//Tracks whether there has been a previous location unavailable error
     var geolocateTimeout = 5000;
     var showWelcome = true;//Used to track whether or not to show welcome message on 'location unavailalble' popup
+    var Chartjs = Chart.noConflict();
     summaryData = {'loadingDatasets': false, 'loadingGroups': false, 'isLoading': function(){return this.loadingDatasets || this.loadingGroups;}}; //Tracks the loading of elements on the summary page for showing/hiding the loader
 
     initialise();
@@ -32,7 +34,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore"], function($, jquerym
     function initialise(){
      initialiseEvents();
      initialiseMap();
-     }
+    }
 
     function initialiseMap(){
       var openStreetMap = 
@@ -898,6 +900,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore"], function($, jquerym
       );
     });
     $('#summary').enhanceWithin();
+    console.log(groups);
   }
 
   function addTop10speciesToPage(top10Species){

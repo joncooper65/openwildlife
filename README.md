@@ -3,7 +3,7 @@ Map My Wildife
 
 An app to map widlife records delivered from Gbif rest services.
 
-Point your device at this to see a recent iteration: http://joncooper65.github.io/openwildlife/
+Point your device at this to see a recent iteration: http://joncooper65.github.io/scattermap/
 
 The vision is to have a location aware map sprinkled with interactive place markers displaying wildlife records.  The user can choose their preferences for common/scientific naming, earliest year and species group.  The placemarkers show species recorded there and the datasets they come from.  The map can be summarised to show common species, taxon group statistics, datasets accessed and date ranges.
 
@@ -12,8 +12,9 @@ The first iteration aims to take the Gbif services as far as they can go.  Since
 dev notes
 ---------
 
-grunt install -g grunt-cli
-
+npm install grunt
+npm install grunt-contrib-uglify
+npm install -g grunt-cli
 
 
 Would like to move over to backbone, coffescript, freemarker and setup proper grunt tasks for building, dist, etc

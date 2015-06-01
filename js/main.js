@@ -795,10 +795,12 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
           });
         });
         addTop10speciesToPage(top10Species);
+        addSpeciesChartToPage(top10Species);
       });
     } else {
       addTop10speciesToPage(top10Species);
-  }
+      addSpeciesChartToPage(top10Species);
+    }
   }
 
   function processAndRenderDatasets(datasets, loadingGroups){
@@ -915,6 +917,25 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     var c = Math.floor(Math.random() * 0xFF).toString(16);
     return '#' + ((a.length < 2) ? '0' + a : a) + ((b.length < 2) ? '0' + b : b) + ((c.length < 2) ? '0' + c : c);
   }
+  
+  function addSpeciesChartToPage(sortedSpecies){
+    console.log(sortedSpecies);
+    var data = [];
+    _.each(sortedSpecies, function(species){
+      data.push({
+        'value': species.numRecs,
+        'color': getRandomHexColour(),
+        'label': species.name()
+      });
+    });
+    $('#species-chart').empty();
+    $canvas = $('<canvas>');
+    $('#species-chart').append($canvas);
+    var ctx = $canvas.get(0).getContext('2d');
+    var groupChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
+//    legend(document.getElementById("group-legend"), data, groupChart);
+  }
+  
   function addGroupChartToPage(sortedGroups){
     var data = [];
     _.each(sortedGroups, function(group){

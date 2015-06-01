@@ -924,9 +924,11 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
         'label': group.name
       });
     });
-    var ctx = $('#group-chart').get(0).getContext('2d');
+    $('#group-chart').empty();
+    $canvas = $('<canvas>');
+    $('#group-chart').append($canvas);
+    var ctx = $canvas.get(0).getContext('2d');
     var groupChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
-
     legend(document.getElementById("group-legend"), data, groupChart);
   }
 

@@ -4,12 +4,11 @@ require.config({
     "jquerymobile": "../vendor/jquery-mobile-bower/js/jquery.mobile-1.4.2.min",
     "leaflet": "../vendor/leaflet/dist/leaflet",
     "underscore": "../vendor/underscore/underscore-min",
-    "Chart": "../vendor/Chart.js/Chart.min",
-    "legend": "../vendor/Chart.js.legend/src/legend"
+    "Chart": "../vendor/Chart.js/Chart.min"
   }
 });
 
-require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart", "legend"], function($, jquerymobile, L, _, Chart, legend){
+require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($, jquerymobile, L, _, Chart){
   $(document).ready(function() {
 
     var map;
@@ -686,9 +685,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart", "legend"], 
     $('#summary-datasets').empty();
     $('#species-group-summary > tbody').empty();
     $('#top-ten-species > tbody').empty();
-    $('#summary-num-markers').html(Object.keys(geojsonResults).length);
-    $('#summary-num-recs').html(moreRecordsText);
-    $('#summary-percentage-recs').html(moreRecordsPercentage);
 
     var speciess = new Object();
     var groups = new Object();
@@ -725,9 +721,14 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart", "legend"], 
       });
     });
 
-    $('#summary-earliest-rec').html(earliestRecord);
-    $('#summary-latest-rec').html(latestRecord);
-    $('#summary-num-species').html(Object.keys(speciess).length);
+    addSummaryToPage(
+      earliestRecord,
+      latestRecord,
+      Object.keys(geojsonResults).length,
+      Object.keys(speciess).length,
+      moreRecordsPercentage
+    );
+
     processAndRenderDatasets(datasets, true);
     renderTop10Species(speciess);
 
@@ -924,29 +925,87 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart", "legend"], 
   }
 
   function addChartToPage(sortedGroups){
-    console.log(sortedGroups);
     var data = [];
     _.each(sortedGroups, function(group){
       data.push({
         'value': group.numSpecies,
         'color': '#' + Math.floor(Math.random()*16777215).toString(16),
-        'highlight': '#0f0',
+        // 'highlight': '#0f0',
         'label': group.name
       });
     });
-//     var options = {
-//       'legendTemplate': "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<segments.length; i++){%><li><span style=\"background-color:<%=segments[i].fillColor%>\"></span><%if(segments[i].label){%><%=segments[i].label%><%}%></li><%}%></ul>"
-
-// var moduleDoughnut = new Chart(canvas.getContext('2d')).Doughnut(moduleData, { tooltipTemplate : "<%if (label){%><%=label%>: <%}%><%= value %>kb", animation: false });
-
-//     };
     var ctx = $('#group-chart').get(0).getContext('2d');
-    var groupChart = new Chart(ctx).Pie(data);
+    var groupChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
 
-    //take a look at this and its source to get going: http://bebraw.github.io/Chart.js.legend/
-    //legend(document.getElementById("pieLegend"), data);
+    legend(document.getElementById("group-legend"), data, groupChart);
   }
 
+  function legend(parent, data) {
+      legend(parent, data, null);
+  }
 
+  //Acknowledgement to http://bebraw.github.io/Chart.js.legend  - code i need not yet tagged so copy and pasting to here
+  function legend(parent, data, chart) {
+      parent.className = 'legend';
+      var datas = data.hasOwnProperty('datasets') ? data.datasets : data;
+
+      // remove possible children of the parent
+      while(parent.hasChildNodes()) {
+          parent.removeChild(parent.lastChild);
+      }
+
+      var show = chart ? showTooltip : noop;
+      datas.forEach(function(d, i) {
+          //span to div: legend appears to all element (color-sample and text-node)
+          var title = document.createElement('div');
+          title.className = 'title';
+          parent.appendChild(title);
+
+          var colorSample = document.createElement('div');
+          colorSample.className = 'color-sample';
+          colorSample.style.backgroundColor = d.hasOwnProperty('strokeColor') ? d.strokeColor : d.color;
+          colorSample.style.borderColor = d.hasOwnProperty('fillColor') ? d.fillColor : d.color;
+          title.appendChild(colorSample);
+
+          var text = document.createTextNode(d.label);
+          text.className = 'text-node';
+          title.appendChild(text);
+
+          show(chart, title, i);
+      });
+  }
+
+  //add events to legend that show tool tips on chart
+  function showTooltip(chart, elem, indexChartSegment){
+      var helpers = Chart.helpers;
+
+      var segments = chart.segments;
+      //Only chart with segments
+      if(typeof segments != 'undefined'){
+          helpers.addEvent(elem, 'mouseover', function(){
+              var segment = segments[indexChartSegment];
+              segment.save();
+              segment.fillColor = segment.highlightColor;
+              chart.showTooltip([segment]);
+              segment.restore();
+          });
+
+          helpers.addEvent(elem, 'mouseout', function(){
+              chart.draw();
+          });
+      }
+  }
+
+  function noop() {}
+
+  function addSummaryToPage(earliest, latest, numPlaces, numSpecies, numRecs){
+
+    $('#summary-earliest-rec').html(earliest);
+    $('#summary-latest-rec').html(latest);
+    $('#summary-num-markers').html(numPlaces);
+    $('#summary-num-species').html(numSpecies);
+    $('#summary-num-recs').html(numRecs);
+    $('#summary').enhanceWithin();
+  }
 
 });

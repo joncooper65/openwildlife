@@ -10,8 +10,7 @@
     "coffee-script": "1.8.0",
     "leaflet": "0.7.3",
     "underscore": "1.8.2",
-    "Chart.js": "1.0.2",
-    "Chart.js.legend": "git://github.com/bebraw/Chart.js.legend.git#~0.3.0"
+    "Chart.js": "1.0.2"
   },
   "resolutions": {
     "jquery": "1.10.2"

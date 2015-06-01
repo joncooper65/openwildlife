@@ -176,7 +176,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
 
       //Populate summary page
       $('#summary-button').click(function(){
-        generateSummary(geojsonResults, moreRecordsText(totalNumRecords), moreRecordsPercentage(totalNumRecords));
+        generateSummary(geojsonResults, totalNumRecords);
       });
 
       //Any events when pages load
@@ -266,13 +266,13 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       }
     }
 
-    function moreRecordsPercentage(totalNumRecords){
-      if(offset > totalNumRecords){
-        return 100;
-      } else {
-        return Math.round((offset/totalNumRecords) * 100);
-      }
-    }
+    // function moreRecordsPercentage(totalNumRecords){
+    //   if(offset > totalNumRecords){
+    //     return 100;
+    //   } else {
+    //     return Math.round((offset/totalNumRecords) * 100);
+    //   }
+    // }
 
     function doLoading(){
       $.mobile.loading( "show", {
@@ -679,7 +679,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     $('#index').enhanceWithin();
   }
 
-  function generateSummary(geojsonResults, moreRecordsText, moreRecordsPercentage){
+  function generateSummary(geojsonResults, numRecs){
     summaryData.loadingGroups = true;
     summaryData.loadingDatasets = true;
     $('#summary-datasets').empty();
@@ -726,7 +726,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       latestRecord,
       Object.keys(geojsonResults).length,
       Object.keys(speciess).length,
-      moreRecordsPercentage
+      numRecs
     );
 
     processAndRenderDatasets(datasets, true);
@@ -755,8 +755,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
         });
         sortedGroups = _.sortBy(vernacularGroupsArray, function(group){return (-1 * group.numRecs);});
       }
-      addGroupsToPage(sortedGroups);
-      addChartToPage(sortedGroups);
+      addGroupChartToPage(sortedGroups);
       summaryData.loadingGroups = false;
       if(!summaryData.isLoading()){
         document.body.dispatchEvent(new CustomEvent('summarygenerated'));
@@ -891,20 +890,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     return toReturn;
   }
 
-  function addGroupsToPage(groups){
-    var $tableBody = $('#species-group-summary > tbody');
-    _.each(groups, function(group){
-      $tableBody.append(
-        $('<tr>').append(
-          $('<td>').text(group.name),
-          $('<td>').text(group.numSpecies),
-          $('<td>').text(group.numRecs)
-          )
-      );
-    });
-    $('#summary').enhanceWithin();
-  }
-
   function addTop10speciesToPage(top10Species){
     var $tableBody = $('#top-ten-species > tbody');
     _.each(top10Species, function(species){
@@ -924,13 +909,18 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     $('#summary').enhanceWithin();
   }
 
-  function addChartToPage(sortedGroups){
+  function getRandomHexColour(){
+    var a = Math.floor(Math.random() * 0xFF).toString(16);
+    var b = Math.floor(Math.random() * 0xFF).toString(16);
+    var c = Math.floor(Math.random() * 0xFF).toString(16);
+    return '#' + ((a.length < 2) ? '0' + a : a) + ((b.length < 2) ? '0' + b : b) + ((c.length < 2) ? '0' + c : c);
+  }
+  function addGroupChartToPage(sortedGroups){
     var data = [];
     _.each(sortedGroups, function(group){
       data.push({
         'value': group.numSpecies,
-        'color': '#' + Math.floor(Math.random()*16777215).toString(16),
-        // 'highlight': '#0f0',
+        'color': getRandomHexColour(),
         'label': group.name
       });
     });
@@ -999,7 +989,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   function noop() {}
 
   function addSummaryToPage(earliest, latest, numPlaces, numSpecies, numRecs){
-
     $('#summary-earliest-rec').html(earliest);
     $('#summary-latest-rec').html(latest);
     $('#summary-num-markers').html(numPlaces);

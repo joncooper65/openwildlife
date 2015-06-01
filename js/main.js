@@ -494,11 +494,20 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   }
 
   function getPopupSpeciesNameLink(species, isScientificNamePref){
+    // var name = '<i>' + species.name + '</i>';
+    // if(!isScientificNamePref && !_.isUndefined(species.vernacularName)){
+    //   name = species.vernacularName;
+    // }
+    var name = getNameFromSpecies(species, isScientificNamePref);
+    return '<li><a class="popup-link" href="#species-info-page?datasetKeys=' + species.datasetKeys.join(',') + '&taxonKey=' + species.taxonKey + '&earliest=' + species.earliestYear + '&latest=' + species.latestYear + '">' + name + '</a></li>';
+  }
+
+function getNameFromSpecies(species, isScientificNamePref){
     var name = '<i>' + species.name + '</i>';
     if(!isScientificNamePref && !_.isUndefined(species.vernacularName)){
       name = species.vernacularName;
     }
-    return '<li><a class="popup-link" href="#species-info-page?datasetKeys=' + species.datasetKeys.join(',') + '&taxonKey=' + species.taxonKey + '&earliest=' + species.earliestYear + '&latest=' + species.latestYear + '">' + name + '</a></li>';
+    return name;
   }
 
   
@@ -687,7 +696,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     $('#top-ten-species > tbody').empty();
 
     var speciess = new Object();
-    var groups = new Object();
     var datasets = [];
     var taxonDeferreds = [];
     var earliestRecord = 3000;
@@ -730,10 +738,12 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     );
 
     processAndRenderDatasets(datasets, true);
-    renderTop10Species(speciess);
+    renderTaxonGroupSummary(taxonDeferreds, speciess);
+  }
 
+  function renderTaxonGroupSummary(taxonDeferreds, speciess){
+    var groups = new Object();
     $.when.apply($, taxonDeferreds).done(function(){
-      //Add the vernacular name to the original species object
       _.each(taxonDeferreds, function(deferred){
         if(groups.hasOwnProperty(deferred.responseJSON.classKey)) {
           groups[deferred.responseJSON.classKey].numSpecies += 1;
@@ -760,7 +770,9 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       if(!summaryData.isLoading()){
         document.body.dispatchEvent(new CustomEvent('summarygenerated'));
       }
+      renderTop10Species(speciess);
     });
+
   }
 
   function renderTop10Species(speciess){
@@ -919,21 +931,20 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   }
   
   function addSpeciesChartToPage(sortedSpecies){
-    console.log(sortedSpecies);
     var data = [];
     _.each(sortedSpecies, function(species){
       data.push({
         'value': species.numRecs,
         'color': getRandomHexColour(),
-        'label': species.name
+        'label': getNameFromSpecies(species, getIsScientificNames())
       });
     });
     $('#species-chart').empty();
     $canvas = $('<canvas>');
     $('#species-chart').append($canvas);
     var ctx = $canvas.get(0).getContext('2d');
-    var groupChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
-//    legend(document.getElementById("group-legend"), data, groupChart);
+    var speciesChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
+    legend(document.getElementById("species-legend"), data, speciesChart);
   }
   
   function addGroupChartToPage(sortedGroups){
@@ -980,10 +991,19 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
           colorSample.style.borderColor = d.hasOwnProperty('fillColor') ? d.fillColor : d.color;
           title.appendChild(colorSample);
 
-          var text = document.createTextNode(d.label);
-          text.className = 'text-node';
-          title.appendChild(text);
-
+          var node;
+          var text;
+          if(d.label.indexOf('<i>')==0){
+            node = document.createElement('i');
+            text = document.createTextNode(d.label.substring(3,d.label.length - 4));
+            text.className = 'text-node';
+            node.appendChild(text);
+            title.appendChild(node);
+          } else {
+            var text = document.createTextNode(d.label);
+            text.className = 'text-node';
+            title.appendChild(text);
+          }
           show(chart, title, i);
       });
   }
@@ -997,6 +1017,9 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       if(typeof segments != 'undefined'){
           helpers.addEvent(elem, 'mouseover', function(){
               var segment = segments[indexChartSegment];
+              if(segment.label.indexOf('<i>')==0){
+                segment.label = segment.label.substring(3,segment.label.length-4);
+              }
               segment.save();
               segment.fillColor = segment.highlightColor;
               chart.showTooltip([segment]);

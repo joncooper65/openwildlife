@@ -925,7 +925,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       data.push({
         'value': species.numRecs,
         'color': getRandomHexColour(),
-        'label': species.name()
+        'label': species.name
       });
     });
     $('#species-chart').empty();

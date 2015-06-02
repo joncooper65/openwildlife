@@ -12,7 +12,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   $(document).ready(function() {
 
     var map;
-    var limit = 300;//Number of records per page, gbif max is 300
+    var pageLimit = 300;//Number of records per page, gbif max is 300
     var totalNumRecords = 0;//Total number of records that are available from gbif for current region - used for paging
     var maxRecords = 3000 //The maximum number of records to fetch from Gbif
     var hasOpenPopups = false;
@@ -72,7 +72,8 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       });
       map.on("moveend", function(e){
         if(!waitingForRecords){
-          addRecords(false);
+//          addRecords(false);
+          tryToGetAllRecords();
         } 
       });
        map.locate({
@@ -203,15 +204,32 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       $('.ui-content .ui-listview, .ui-panel-inner>.ui-listview').css('margin', '0em 0em -1em -1em');
     }
 
-    function getAllRecords(totalNumRecords){
-      var deferreds = getRecordDeferreds(totalNumRecords);
+    function tryToGetAllRecords(processRecordDeferredAndAddToMap){
+      $.mobile.loading( "show" );
+      var deferreds = getRecordDeferreds(1,0);
+      geojsonResults = {};
       $.when.apply($, deferreds).done(function(){
+        updateGeojsonModel(deferreds[0].responseJSON.results);
+        var totalNumRecords = deferreds[0].responseJSON.count;
+        if(totalNumRecords > maxRecords){
+          $.mobile.loading( "hide" );
+          $('#too-many-popup').popup('open');
+        } else {
+          getAllRecords(totalNumRecords, pageLimit, true);
+        }
+      });
+    }
+
+    function getAllRecords(totalNumRecords, offset, isAddMoreRecords){
+      var deferreds = getRecordDeferreds(totalNumRecords, offset);
+      $.when.apply($, deferreds).done(function(){
+        if(!isAddMoreRecords){
+          geojsonResults = {};
+        }
         removeCurrentMarkers();
-        geojsonResults = {};
         _.each(deferreds, function(deferred){
           updateGeojsonModel(deferred.responseJSON.results);
         });
-
         L.geoJson(getGeojson(geojsonResults), {
             onEachFeature: onEachFeature,
             pointToLayer: function(feature, latlng){
@@ -221,17 +239,16 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
               return L.marker(latlng, {icon: icon});
             }
         }).addTo(map);
-
+        $.mobile.loading( "hide" );
       });
     }
 
-    function getRecordDeferreds(totalNumRecords){
+    function getRecordDeferreds(totalNumRecords, offset){
       var toReturn = [];
-      var offset = 0;
       var bounds = map.getBounds();
       while(offset < totalNumRecords){
         toReturn.push(getGbifRecordDeferred(bounds.getNorth(), bounds.getSouth(), bounds.getEast(), bounds.getWest(), offset));
-        offset += limit;
+        offset += pageLimit;
       }
       return toReturn;
     }
@@ -243,7 +260,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
                    + '&hasCoordinate=true'
                    + ((startYear != 1900) ? '&year=' + startYear + ',' + new Date().getFullYear() : '')
                    + getTaxonGroupKeys()
-                   + '&limit=' + limit
+                   + '&limit=' + pageLimit
                    + '&offset=' + offset;
       return $.ajax({
                   type: 'GET',
@@ -341,7 +358,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
                    + '&hasCoordinate=true'
                    + ((startYear != 1900) ? '&year=' + startYear + ',' + new Date().getFullYear() : '')
                    + getTaxonGroupKeys()
-                   + '&limit=' + limit
+                   + '&limit=' + pageLimit
                    + ((isAddMoreRecords) ? '&offset=' + offset : '');
     }
 
@@ -373,7 +390,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     * nested 'species' property.
     */
     function removeCurrentMarkers(){
-      offset = limit;
+      offset = pageLimit;
       geojsonResults = {};
       map.eachLayer(function(layer){
       try{

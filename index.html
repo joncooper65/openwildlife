@@ -5,7 +5,6 @@
 		<link rel="stylesheet" href="vendor/leaflet/dist/leaflet.css" />
 	  <link rel="stylesheet" href="vendor/jquery-mobile-bower/css/jquery.mobile-1.4.2.min.css" />
 	  <link rel="stylesheet" href="css/style.css" />
-
 		<script data-main="js/main" src="vendor/requirejs/require.js"></script>
 	</head>
 	<body>
@@ -118,9 +117,52 @@
 				<p class="app-title">Summary</p>
 			</div>
 			<div data-role="content">
-				<p>There are <span id='summary-num-markers'></span> placemarkers on your map containing <span id='summary-num-species'></span> species from <span id='summary-earliest-rec'></span> to <span id='summary-latest-rec'></span>.</p>
+				<div class="app-container">
+
+					<ul data-role="listview" class="ui-corner-all">
+						<li>
+							<table id="data-summary" class="summary-table">
+								<thead>
+								</thead>
+								<tbody>
+									<tr>
+											<td>Date range</td>
+											<td><span id='summary-earliest-rec'></span> to <span id='summary-latest-rec'></span></td>
+									</tr>
+									<tr>
+										<td>Number of markers on map</td>
+										<td><span id='summary-num-markers'></span></td>
+									</tr>
+									<tr>
+										<td>Number of species</td>
+										<td><span id='summary-num-species'></span></td>
+									</tr>
+									<tr>
+										<td>Number of observations</td>
+										<td><span id='summary-num-recs'></span></td>
+									</tr>
+								</tbody>
+							</table>
+							</li>
+					</ul>
+				</div>
+
+<!-- 				<p>There are <span id='summary-num-markers'></span> placemarkers on your map containing <span id='summary-num-species'></span> species from <span id='summary-earliest-rec'></span> to <span id='summary-latest-rec'></span>.</p>
 				<p>Your map has <span id='summary-percentage-recs'></span>% (<span id='summary-num-recs'></span>) of the sightings available from Gbif for the area shown.
- 				<div data-role="collapsible" data-theme="b" data-content-theme="b">
+ -->
+				<div class='app-chart-container'>
+	 				<h4 class="app-heading">Species groups</h4>
+					<div id='group-chart'></div>
+					<div id='group-legend'></div>
+				</div>
+				<div class='app-chart-container'>
+	 				<h4 class="app-heading">Top species</h4>
+					<div id='species-chart'></div>
+					<div id='species-legend'></div>
+				</div>
+
+
+ 				<div>
  					<h4><span id='summary-species-title'/></h4>
 					<table id='top-ten-species' class='summary-table'>
 						<thead>
@@ -133,21 +175,7 @@
 						</tbody>
 					</table>
  				</div>
- 				<div data-role="collapsible" data-theme="b" data-content-theme="b">
-	 				<h4>Species groups</h4>
-					<table id='species-group-summary' class='summary-table'>
-						<thead>
-							<tr>
-								<th><span id=''>Group</span></th>
-								<th>Num species</th>
-								<th>Num records</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
- 				<div data-role="collapsible" data-theme="b" data-content-theme="b">
+ 				<div>
 					<h4>Datasets</h4>
  						<div id='summary-datasets' />
 				</div>

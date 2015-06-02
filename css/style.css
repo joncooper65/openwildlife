@@ -190,6 +190,40 @@ a:focus {
   color: #dfff00;
 }
 
+.legend {
+    /*border: 1px solid black;*/
+}
+
+.legend .title {
+    display: block;
+    margin-bottom: 0.5em;
+    line-height: 1.2em;
+    padding: 0 0.3em;
+}
+
+.legend .color-sample {
+    display: block;
+    float: left;
+    width: 1em;
+    height: 1em;
+    border: 2px solid;
+    border-radius: 0.3em;
+    margin-right: 0.5em;
+}
+
+.app-heading {
+  font-size: 1.5em;
+  font-weight: normal;
+  text-align: center;
+  color: #fff;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.app-container {
+    padding: 20px; 
+}
+
 .app-title {
   margin-top: 5px;
   color: #dfff00;
@@ -197,4 +231,3 @@ a:focus {
   font-weight: normal;
   text-align: center;
 }
-

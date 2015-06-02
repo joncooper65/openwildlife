@@ -12,13 +12,13 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   $(document).ready(function() {
 
     var map;
+    var limit = 300;//Number of records per page, gbif max is 300
+    var totalNumRecords = 0;//Total number of records that are available from gbif for current region - used for paging
+    var maxRecords = 3000 //The maximum number of records to fetch from Gbif
     var hasOpenPopups = false;
     var isScientificNamePref = true;//Show either vernacular (false) names in popup, or else scientific - only used for those without localStorage
     var startYear = String(1900);//Don't get records before this year
     var taxonGroups = ''//Limit to a taxonomic group
-    var totalNumRecords = 0;//Total number of records that are available from gbif for current region - used for paging
-    var limit = 300;//Number of records per page
-    var offset = limit;//Index of last record from gbif - used for paging
     var waitingForRecords = false;//Don't fire any other requests if this is true - helps with map panning
     var boundingBoxOfRecords;//Used to track the bbox of the current set of species records, primarily to refresh the records if the map bounding box is different
     var yearOfRecords;//Used to track the year filter of the current set of species records, primarily to refresh the records if the slider's year value is diffferent
@@ -149,13 +149,10 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
 
       //Handle the 'add more records' click event
       $('#add-more-records').click(function(e){
-        if(offset >= totalNumRecords){
-          $('#no-more-records-popup').popup('open');
+        if(totalNumRecords > maxRecords){
+          $('#too-many-popup').popup('open');
         } else {
-          if(!waitingForRecords){
-            addRecords(true);
-            offset = offset + limit;
-          }
+          getAllRecords(totalNumRecords);
         }
       });
 
@@ -204,6 +201,66 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       $('.leaflet-popup-tip').css('background', background);
       $('.leaflet-popup-content').css({'border-color': background});
       $('.ui-content .ui-listview, .ui-panel-inner>.ui-listview').css('margin', '0em 0em -1em -1em');
+    }
+
+    function getAllRecords(totalNumRecords){
+      var deferreds = getRecordDeferreds(totalNumRecords);
+      $.when.apply($, deferreds).done(function(){
+        removeCurrentMarkers();
+        geojsonResults = {};
+        _.each(deferreds, function(deferred){
+          updateGeojsonModel(deferred.responseJSON.results);
+        });
+
+        L.geoJson(getGeojson(geojsonResults), {
+            onEachFeature: onEachFeature,
+            pointToLayer: function(feature, latlng){
+              var icon = L.icon({
+                            iconUrl: 'images/marker-icon-green-' + getIconIndex(feature.properties.species.length) + '.png'
+              });
+              return L.marker(latlng, {icon: icon});
+            }
+        }).addTo(map);
+
+      });
+    }
+
+    function getRecordDeferreds(totalNumRecords){
+      var toReturn = [];
+      var offset = 0;
+      var bounds = map.getBounds();
+      while(offset < totalNumRecords){
+        toReturn.push(getGbifRecordDeferred(bounds.getNorth(), bounds.getSouth(), bounds.getEast(), bounds.getWest(), offset));
+        offset += limit;
+      }
+      return toReturn;
+    }
+
+    function getGbifRecordDeferred(north, south, east, west, offset){
+      var url = 'http://api.gbif.org/v1/occurrence/search?decimalLongitude=' 
+                   + west + ',' + east
+                   + '&decimalLatitude=' + south + ',' + north
+                   + '&hasCoordinate=true'
+                   + ((startYear != 1900) ? '&year=' + startYear + ',' + new Date().getFullYear() : '')
+                   + getTaxonGroupKeys()
+                   + '&limit=' + limit
+                   + '&offset=' + offset;
+      return $.ajax({
+                  type: 'GET',
+                  url: url,
+                  async: true,
+                  contentType: "application/json",
+                  dataType: 'jsonp',
+                  error: function(e) {
+                    $.mobile.loading( "hide" );
+                    console.log(e.getResponseHeader());
+                  },
+                  statusCode: {
+                    503: function(){
+                      console.log('gbif service failed to respond');
+                    }
+                  }
+      });
     }
 
     function addRecords(isAddMoreRecords){

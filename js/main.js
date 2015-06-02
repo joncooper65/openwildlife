@@ -266,14 +266,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       }
     }
 
-    // function moreRecordsPercentage(totalNumRecords){
-    //   if(offset > totalNumRecords){
-    //     return 100;
-    //   } else {
-    //     return Math.round((offset/totalNumRecords) * 100);
-    //   }
-    // }
-
     function doLoading(){
       $.mobile.loading( "show", {
         defaults: true
@@ -745,6 +737,12 @@ function getNameFromSpecies(species, isScientificNamePref){
     var groups = new Object();
     $.when.apply($, taxonDeferreds).done(function(){
       _.each(taxonDeferreds, function(deferred){
+        //Some species observations are not classified, so force them into an unclassified class
+        if(!deferred.responseJSON.hasOwnProperty('classKey')){
+          deferred.responseJSON.classKey = '-1';
+          deferred.responseJSON.class = 'unclassified';
+          deferred.responseJSON.kingdomKey = 'incertae sedis';
+        }
         if(groups.hasOwnProperty(deferred.responseJSON.classKey)) {
           groups[deferred.responseJSON.classKey].numSpecies += 1;
           groups[deferred.responseJSON.classKey].numRecs += speciess[deferred.responseJSON.key].numRecs;
@@ -781,9 +779,9 @@ function getNameFromSpecies(species, isScientificNamePref){
       speciesArray.push(species);
     });
     var top10Species = _.sortBy(speciesArray, function(species){return (-1 * species.numRecs);}).slice(0,10);
-    var title = 'Top 10 species';
+    var title = 'Most observed species';
     if(top10Species.length < 10){
-      title = 'All species';
+      title = 'Observations per species';
     }
     $('#summary-species-title').html(title);
     if(!getIsScientificNames()){
@@ -806,11 +804,9 @@ function getNameFromSpecies(species, isScientificNamePref){
             }
           });
         });
-        addTop10speciesToPage(top10Species);
         addSpeciesChartToPage(top10Species);
       });
     } else {
-      addTop10speciesToPage(top10Species);
       addSpeciesChartToPage(top10Species);
     }
   }
@@ -904,25 +900,6 @@ function getNameFromSpecies(species, isScientificNamePref){
     return toReturn;
   }
 
-  function addTop10speciesToPage(top10Species){
-    var $tableBody = $('#top-ten-species > tbody');
-    _.each(top10Species, function(species){
-      var name = '<i>' + species.name + '</i>';
-      if(!getIsScientificNames()){
-        if(!_.isUndefined(species.vernacularName)){
-          name = species.vernacularName;
-        }
-      }
-      $tableBody.append(
-        $('<tr>').append(
-          $('<td>').html(name),
-          $('<td>').text(species.numRecs)
-          )
-      );
-    });
-    $('#summary').enhanceWithin();
-  }
-
   function getRandomHexColour(){
     var a = Math.floor(Math.random() * 0xFF).toString(16);
     var b = Math.floor(Math.random() * 0xFF).toString(16);
@@ -943,7 +920,7 @@ function getNameFromSpecies(species, isScientificNamePref){
     $canvas = $('<canvas>');
     $('#species-chart').append($canvas);
     var ctx = $canvas.get(0).getContext('2d');
-    var speciesChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
+    var speciesChart = new Chart(ctx).Pie(data, {'responsive': 'false', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
     legend(document.getElementById("species-legend"), data, speciesChart);
   }
   
@@ -960,7 +937,7 @@ function getNameFromSpecies(species, isScientificNamePref){
     $canvas = $('<canvas>');
     $('#group-chart').append($canvas);
     var ctx = $canvas.get(0).getContext('2d');
-    var groupChart = new Chart(ctx).Pie(data, {'responsive': 'true', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
+    var groupChart = new Chart(ctx).Pie(data, {'responsive': 'false', 'segmentShowStroke': 'true', 'segmentStrokeWidth': 1, 'segmentStrokeColor': '#252525'});
     legend(document.getElementById("group-legend"), data, groupChart);
   }
 

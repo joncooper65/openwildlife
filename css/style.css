@@ -216,12 +216,13 @@ a:focus {
   font-weight: normal;
   text-align: center;
   color: #fff;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin: 30px 0px 10px;
+  background-color:  #333;
+  padding: 5px;
 }
 
 .app-container {
-    padding: 20px; 
+  padding: 5px 6px;
 }
 
 .app-title {
@@ -230,4 +231,9 @@ a:focus {
   font-size: 1.5em !important;
   font-weight: normal;
   text-align: center;
+}
+
+.app-summary {
+  font-size: 1em;
+  margin-top: 10px;
 }

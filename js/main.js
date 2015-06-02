@@ -486,10 +486,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
   }
 
   function getPopupSpeciesNameLink(species, isScientificNamePref){
-    // var name = '<i>' + species.name + '</i>';
-    // if(!isScientificNamePref && !_.isUndefined(species.vernacularName)){
-    //   name = species.vernacularName;
-    // }
     var name = getNameFromSpecies(species, isScientificNamePref);
     return '<li><a class="popup-link" href="#species-info-page?datasetKeys=' + species.datasetKeys.join(',') + '&taxonKey=' + species.taxonKey + '&earliest=' + species.earliestYear + '&latest=' + species.latestYear + '">' + name + '</a></li>';
   }
@@ -799,7 +795,7 @@ function getNameFromSpecies(species, isScientificNamePref){
             var isRequiredSpecies = (species.taxonKey == deferred.responseJSON.speciesKey);
             if(isRequiredSpecies){
               if(!_.isUndefined(deferred.responseJSON.vernacularName)){
-                species.vernacularName = deferred.responseJSON.vernacularName;
+                species.vernacularName = firstToUpper(deferred.responseJSON.vernacularName);
               }
             }
           });

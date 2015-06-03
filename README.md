@@ -1,4 +1,4 @@
-OpenWildife
+OpenWildlife
 ===========
 
 An app to map widlife records delivered from Gbif rest services.

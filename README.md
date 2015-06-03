@@ -9,8 +9,8 @@ The vision is to have a location aware map sprinkled with interactive place mark
 
 The first iteration aims to take the Gbif services as far as they can go.  Since they aren't designed to support an app like this we want to find what works and what doesn't, and what further back end services are needed.  It will also drive out design and features we like.
 
-dev notes
----------
+notes
+-----
 
 npm install grunt
 

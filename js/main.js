@@ -72,7 +72,6 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       });
       map.on("moveend", function(e){
         if(!waitingForRecords){
-//          addRecords(false);
           tryToGetAllRecords();
         } 
       });
@@ -210,7 +209,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
       geojsonResults = {};
       $.when.apply($, deferreds).done(function(){
         updateGeojsonModel(deferreds[0].responseJSON.results);
-        var totalNumRecords = deferreds[0].responseJSON.count;
+        totalNumRecords = deferreds[0].responseJSON.count;
         if(totalNumRecords > maxRecords){
           $.mobile.loading( "hide" );
           $('#too-many-popup').popup('open');
@@ -248,6 +247,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
             return L.marker(latlng, {icon: icon});
           }
       }).addTo(map);
+      $('#total-num-recs').html(totalNumRecords);
       $.mobile.loading( "hide" );
     }
 
@@ -798,7 +798,7 @@ function getNameFromSpecies(species, isScientificNamePref){
         });
       });
     });
-
+console.log(numRecs);
     addSummaryToPage(
       earliestRecord,
       latestRecord,

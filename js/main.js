@@ -222,25 +222,33 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
 
     function getAllRecords(totalNumRecords, offset, isAddMoreRecords){
       var deferreds = getRecordDeferreds(totalNumRecords, offset);
-      $.when.apply($, deferreds).done(function(){
-        if(!isAddMoreRecords){
-          geojsonResults = {};
-        }
-        removeCurrentMarkers();
-        _.each(deferreds, function(deferred){
-          updateGeojsonModel(deferred.responseJSON.results);
+      if(deferreds.length == 0){
+        displayPlacemarkers();
+      } else {
+        $.when.apply($, deferreds).done(function(){
+          if(!isAddMoreRecords){
+            geojsonResults = {};
+          }
+          _.each(deferreds, function(deferred){
+            updateGeojsonModel(deferred.responseJSON.results);
+          });
+          displayPlacemarkers();
         });
-        L.geoJson(getGeojson(geojsonResults), {
-            onEachFeature: onEachFeature,
-            pointToLayer: function(feature, latlng){
-              var icon = L.icon({
-                            iconUrl: 'images/marker-icon-green-' + getIconIndex(feature.properties.species.length) + '.png'
-              });
-              return L.marker(latlng, {icon: icon});
-            }
-        }).addTo(map);
-        $.mobile.loading( "hide" );
-      });
+      }
+    }
+
+    function displayPlacemarkers(){
+      removeCurrentMarkers();
+      L.geoJson(getGeojson(geojsonResults), {
+          onEachFeature: onEachFeature,
+          pointToLayer: function(feature, latlng){
+            var icon = L.icon({
+                          iconUrl: 'images/marker-icon-green-' + getIconIndex(feature.properties.species.length) + '.png'
+            });
+            return L.marker(latlng, {icon: icon});
+          }
+      }).addTo(map);
+      $.mobile.loading( "hide" );
     }
 
     function getRecordDeferreds(totalNumRecords, offset){
@@ -391,7 +399,7 @@ require(["jquery", "jquerymobile", "leaflet", "underscore", "Chart"], function($
     */
     function removeCurrentMarkers(){
       offset = pageLimit;
-      geojsonResults = {};
+//      geojsonResults = {};
       map.eachLayer(function(layer){
       try{
         if(!_.isUndefined(layer.feature.properties.species)){

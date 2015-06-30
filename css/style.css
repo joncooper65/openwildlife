@@ -100,7 +100,6 @@ div.settings-input {
   margin-bottom: 15px;
 }
 
-
 /*These needed for forcing footer to be in correct place*/
 .ui-footer {
     position:absolute !important;
@@ -109,6 +108,7 @@ div.settings-input {
     bottom: 0;
     left: 0;
 }
+
 .leaflet-bottom {
   bottom: 0px;
 }

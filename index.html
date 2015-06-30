@@ -15,7 +15,7 @@
 			<div data-role="content" id="map-page">
 				<div id="map"></div>
 			</div>
-			<div data-role="footer"> 
+			<!-- <div data-role="footer">  -->
 				<div data-role="popup" id="too-many-popup">
 					<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 					<p>Too many records to add</p>
@@ -26,24 +26,21 @@
 					<p><span class='app-highlight'>OpenWildife</span> can't find your location, so here is a random nature reserve instead</p>
 					<h4><span id='random-reserve-name'/></h4>
 				</div>
-				<div data-role="navbar" class="ui-grid-c">
+
+
+<!-- 				<div data-role="navbar" class="ui-grid-c">
 					<div class="ui-block-a footer-menu">
 						<a href="#app-info" id='info' class="ui-btn ui-corner-all ui-shadow ui-mini ui-btn-icon-right ui-icon-info ui-btn-icon-top">Info</a>
-<!--						<a href="#app-info" id='info' data-role="button" data-inline="true" data-icon="info" data-iconpos="top">Info</a>-->
 					</div>
 					<div class="ui-block-b footer-menu">
 						<a href="#settings" data-role="button" class="ui-btn ui-corner-all ui-shadow ui-mini ui-btn-icon-right ui-icon-gear ui-btn-icon-top">Settings</a>
-<!--						<a href="#settings" data-role="button" data-inline="true" data-icon="gear" data-iconpos="top">Settings</a>-->
 					</div>
 					<div class="ui-block-c footer-menu">
 						<a href="#" id='geolocate-button' class="ui-btn ui-corner-all ui-shadow ui-mini ui-btn-icon-right ui-icon-location ui-btn-icon-top">My Location</a></div>
-<!-- 						<a href="#" id='geolocate-button' data-role="button" data-inline="true" data-icon="navigation" data-iconpos="top">My Location</a></div>
- -->					<div class="ui-block-d footer-menu">
+					<div class="ui-block-d footer-menu">
 						<a href="#summary" id='summary-button'  class="ui-btn ui-corner-all ui-shadow ui-mini ui-btn-icon-right ui-icon-action ui-btn-icon-top">Summary</a></div>
-<!-- 						<a href="#summary" id='summary-button' data-role="button" data-inline="true" data-icon="action" data-iconpos="top">Summary</a></div>
- -->				</div>
-
-
+				</div>
+ -->
 
 <!-- 		<div data-role="navbar" data-grid="d">		
 					<ul>
@@ -54,7 +51,15 @@
 					</ul>
  				</div>
 -->
-			</div> 
+<!--			</div> -->
+			<div data-role="footer">
+				<div class="ui-grid-c">
+				    <div class="ui-block-a"><div class="button-wrap"><a href='#app-info' id='info' ><button class="ui-shadow ui-btn ui-corner-all ui-icon-info ui-btn-icon-top">Info</button></a></div></div>
+				    <div class="ui-block-b"><div class="button-wrap"><a href="#settings" ><button class="ui-shadow ui-btn ui-corner-all ui-icon-gear ui-btn-icon-top">Settings</button></a></div></div>
+				    <div class="ui-block-c"><div class="button-wrap"><a href="#" id='geolocate-button'><button class="ui-shadow ui-btn ui-corner-all ui-icon-location ui-btn-icon-top">Locate</button></a></div></div>
+				    <div class="ui-block-d"><div class="button-wrap"><a href="#summary" id='summary-button'><button class="ui-shadow ui-btn ui-corner-all ui-icon-action ui-btn-icon-top">Button</button></a></div></div>
+				</div>
+			</div>
 		</div>
 
 		<div data-role="page" id="settings" data-theme="b">
